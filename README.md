@@ -16,4 +16,4 @@ The solutions.json file is incomplete.
 
 ### Credits
 
-Originally created by @jonnynewbs
+Originally created by [@jonnynewbs](https://github.com/jonnynewbs)
