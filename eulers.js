@@ -1,15 +1,11 @@
 var fs = require('fs');
+var vm = require('vm');
 
-function make_command(user,j) {
-  return(__dirname + "/user_sols/" + user + "/" + j.toString() + ".js")
-}
-
-function handle_answer(user,problem,answer) {
-  return;
+function get_path(user,prob) {
+  return(__dirname + "/user_sols/" + user + "/" + prob.toString() + ".js")
 }
 
 function main() {
-
   //Get the users
   var users = require('./users.json');
 
@@ -20,45 +16,41 @@ function main() {
   // Get the solutions
   var answers = require('./answers.json');
 
-  for (var i = 0; i < answers.length; i++) {
-      console.log(answers[i].answer);
-  }
-
   // Create an object for the results
 
   // Iterate through the users
   for (var i = 0; i < users.length; i++) {
-    user = users[i].name;
+    user = users[i];
     console.log(user);
     
     // Iterate through the problems
-    for (var j = first; j <= last; j++) {
+    for (var prob = first; prob <= last; prob++) {
     
-      console.log("problem " + j)
+      console.log("problem " + prob)
       
       // Get the time now
       var scriptstart = new Date().getTime();
-      console.log("time now is " + scriptstart);
+      console.log("Time now: " + scriptstart);
       
-      // Construct command and run it
-      var command = make_command(user,j);
-      console.log("command is " + command);
+      // Get the path and run the script
+      var path = get_path(user,prob);
       
-      fs.readFile(command, 'utf8', function (err, data) {
-        if (err) throw err;
-        eval(data)
-      });
+      (function() { //wrap callback to capture correct answer for checking -- should split this off as a named function and capture user, problem number and start time.
+        var ans = answers[prob]
+        fs.readFile(path, 'utf8', function (err, data) {
+          if (err) throw err;
+          
+          var sol = vm.runInNewContext(data);
+          if (sol == ans) {
+            console.log(sol + " is the correct answer!")
+          }
+          else{
+            console.log(sol + " is incorrect! " + ans + " is correct")
+          }
+        });
+      })();  
       
-      
-//      
-//      var spawn = require('child_process').spawn
-//      var cmd = spawn('node', [command], {cwd: process.cwd()});
-//      
-//      cmd.stdout.on('data', function (data) {
-//        handle_answer(user,j,data);
-//        console.log('stdout: ' + data);
-//      });
-        // Get the time now and add the result to the results object
+        // Get the time now and add the result to the results obprobect
       
     }
       // Iterate through results and print winners

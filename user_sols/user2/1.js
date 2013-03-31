@@ -1,7 +1,7 @@
-//User 1 cheats
+//User 2 cheats and gets the wrong answer
 
 function main() {
-  process.stdout.write("233178")
+  return 233178;
 }
 
 main()
