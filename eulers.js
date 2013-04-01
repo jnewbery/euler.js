@@ -1,17 +1,41 @@
 var fs = require('fs');
 var vm = require('vm');
 
-function get_path(user,prob) {
+function get_path(user, prob) {
   return(__dirname + "/user_sols/" + user + "/" + prob.toString() + ".js")
+}
+
+function run_attempt(prob, user, ans, path, start_time) { //capture problem number, user, answer, path and start time
+  fs.readFile(path, 'utf8', function (err, data) {
+    console.log("===\nUser: " + user + ", problem: " + prob + ", Start time: " + start_time + ".")
+    if (err) {
+      console.log("Unable to read solution script.");
+      return;
+    }
+          
+    var sol = vm.runInNewContext(data);
+    if (sol == ans) {
+      var elapsed_time = new Date().getTime() - start_time;
+      console.log(sol + " is the correct answer!")
+      console.log("Elapsed time was " + elapsed_time)
+
+      //add success to the results object
+    }
+    else {
+      console.log(sol + " is incorrect! The correct answer is " + ans)
+      // add failure to results object
+    }
+  });
 }
 
 function main() {
   //Get the users
   var users = require('./users.json');
 
-  //Parse the parameters
-  var first = 1;
-  var last = 1;
+  //Get the parameters
+  var params = require('./params.json');  
+  var first = params.first;
+  var last = params.last;
 
   // Get the solutions
   var answers = require('./answers.json');
@@ -21,36 +45,17 @@ function main() {
   // Iterate through the users
   for (var i = 0; i < users.length; i++) {
     user = users[i];
-    console.log(user);
     
     // Iterate through the problems
     for (var prob = first; prob <= last; prob++) {
-    
-      console.log("problem " + prob)
-      
+
       // Get the time now
-      var scriptstart = new Date().getTime();
-      console.log("Time now: " + scriptstart);
+      var start_time = new Date().getTime();
       
       // Get the path and run the script
       var path = get_path(user,prob);
       
-      (function() { //wrap callback to capture correct answer for checking -- should split this off as a named function and capture user, problem number and start time.
-        var ans = answers[prob]
-        fs.readFile(path, 'utf8', function (err, data) {
-          if (err) throw err;
-          
-          var sol = vm.runInNewContext(data);
-          if (sol == ans) {
-            console.log(sol + " is the correct answer!")
-          }
-          else{
-            console.log(sol + " is incorrect! " + ans + " is correct")
-          }
-        });
-      })();  
-      
-        // Get the time now and add the result to the results obprobect
+      run_attempt(prob,user,answers[prob],path,start_time);
       
     }
       // Iterate through results and print winners
