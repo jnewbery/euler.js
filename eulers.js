@@ -5,7 +5,9 @@ function get_path(user, prob) {
   return(__dirname + "/user_sols/" + user + "/" + prob.toString() + ".js")
 }
 
-function run_attempt(prob, user, ans, path, start_time) { //capture problem number, user, answer, path and start time
+function run_attempt(prob, user, ans) { //capture problem number, user and answer
+  var path = get_path(user,prob);
+  start_time = new Date().getTime();
   fs.readFile(path, 'utf8', function (err, data) {
     console.log("===\nProblem: " + prob + ", User: " + user + ", Start time: " + start_time + ".")
     if (err) {
@@ -47,17 +49,13 @@ function main() {
     
     // Iterate through the problems
     for (var prob = first; prob <= last; prob++) {
-
-      // Get the time now
-      var start_time = new Date().getTime();
       
-      // Get the path and run the script
-      var path = get_path(user,prob);
-      
-      run_attempt(prob,user,answers[prob],path,start_time);
+      // Run the script
+      run_attempt(prob,user,answers[prob]);
       
     }
-      // Iterate through results and print winners
+    
+  // Iterate through results and print winners
 
   }
 }
