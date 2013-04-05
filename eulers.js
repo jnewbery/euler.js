@@ -86,7 +86,7 @@ function main() {
 
   console.log(tests);
 
-  for (var i = 1; i < tests.length; i++) {
+  for (var i = 0; i < tests.length; i++) {
     runAttempt(tests[i]);
   }
 
