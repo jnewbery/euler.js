@@ -2,6 +2,7 @@ var fs = require('fs');
 var vm = require('vm');
 var sandbox = require('sandbox')
 
+<<<<<<< HEAD
 Array.prototype.shuffle = function() {
   var i = this.length, j, tempi, tempj;
   if ( i == 0 ) return this;
@@ -15,6 +16,8 @@ Array.prototype.shuffle = function() {
   return this;
 }
 
+=======
+>>>>>>> sandbox
 function logHeader(test){
   console.log("===\nProblem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + ".")
 }
@@ -80,9 +83,17 @@ function main() {
     // Iterate through the problems
     for (var prob = first; prob <= last; prob++) {
 
+<<<<<<< HEAD
       //var test = {prob:prob,user:user,ans:answers[prob]};
       tests.push({prob:prob,user:user,ans:answers[prob]});
       //tests.push(test)      
+=======
+      var test = {prob:prob,user:user,ans:answers[prob]};
+
+      // Run the script
+      runAttempt(test);
+      
+>>>>>>> sandbox
     }
   }
   tests.shuffle();
