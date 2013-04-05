@@ -1,31 +1,59 @@
 var fs = require('fs');
 var vm = require('vm');
+var sandbox = require('sandbox')
 
-function get_path(user, prob) {
+Array.prototype.shuffle = function() {
+  var i = this.length, j, tempi, tempj;
+  if ( i == 0 ) return this;
+  while ( --i ) {
+     j       = Math.floor( Math.random() * ( i + 1 ) );
+     tempi   = this[i];
+     tempj   = this[j];
+     this[i] = tempj;
+     this[j] = tempi;
+  }
+  return this;
+}
+
+function logHeader(test){
+  console.log("===\nProblem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + ".")
+}
+
+function getPath(user, prob) {
   return(__dirname + "/user_sols/" + user + "/" + prob.toString() + ".js")
 }
 
-function run_attempt(prob, user, ans) { //capture problem number, user and answer
-  var path = get_path(user,prob);
-  start_time = new Date().getTime();
+function checkAnswer(test,result) {
+  if (result == test.ans) {
+    var elapsedTime = new Date().getTime() - test.startTime;
+    logHeader(test);
+    console.log(result + " is the correct answer! Elapsed time was " + elapsedTime + ".")
+
+    //add success test.to the results object
+  }
+  else {
+    logHeader(test);
+    console.log(result + " is incorrect. The correct answer is " + test.ans + ".")
+    // add failure to results object
+  }
+}
+
+function runAttempt(test) {
+
+  var s = new sandbox()
+
+  var path = getPath(test.user,test.prob);
+  startTime = new Date().getTime();
+  test.startTime = startTime;
   fs.readFile(path, 'utf8', function (err, data) {
-    console.log("===\nProblem: " + prob + ", User: " + user + ", Start time: " + start_time + ".")
     if (err) {
+      logHeader(test);
       console.log("Unable to read solution script.");
       return;
     }
           
-    var sol = vm.runInNewContext(data);
-    if (sol == ans) {
-      var elapsed_time = new Date().getTime() - start_time;
-      console.log(sol + " is the correct answer! Elapsed time was " + elapsed_time + ".")
-
-      //add success to the results object
-    }
-    else {
-      console.log(sol + " is incorrect. The correct answer is " + ans + ".")
-      // add failure to results object
-    }
+    s.run(data,function(output) {checkAnswer(test,output.result)});
+ 
   });
 }
 
@@ -41,6 +69,8 @@ function main() {
   // Get the solutions
   var answers = require('./answers.json');
 
+  var tests = new Array();
+
   // Create an object for the results
 
   // Iterate through the users
@@ -49,15 +79,21 @@ function main() {
     
     // Iterate through the problems
     for (var prob = first; prob <= last; prob++) {
-      
-      // Run the script
-      run_attempt(prob,user,answers[prob]);
-      
-    }
-    
-  // Iterate through results and print winners
 
+      //var test = {prob:prob,user:user,ans:answers[prob]};
+      tests.push({prob:prob,user:user,ans:answers[prob]});
+      //tests.push(test)      
+    }
   }
+  tests.shuffle();
+
+  console.log(tests);
+
+  for (var i = 1; i < tests.length; i++) {
+    runAttempt(tests[i]);
+  }
+
+  // Iterate through results and print winners
 }
 
 main()
