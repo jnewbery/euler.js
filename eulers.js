@@ -15,8 +15,12 @@ Array.prototype.shuffle = function() {
   return this;
 }
 
+function logHeader(test){
+  return ("Problem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + " :: ");
+}
+
 function checkAnswer(test,result) {
-  var log = ("Problem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + " :: ");
+  var log = logHeader(test);
   if (result == test.ans) {
     var elapsedTime = new Date().getTime() - test.startTime;
     log += (result + " is the correct answer! Elapsed time was " + elapsedTime + ".");
