@@ -32,10 +32,10 @@ function checkAnswer(test,result) {
   }
   else if (result == "TimeoutError") {
     log += ("Solution timed out!")
-    // add failure to resultsobject
+    // add failure to results object
   }
   else {
-    log += (result + " is incorrect. The correct answer is " + test.ans + ".")
+    log += (result + " is incorrect!")
     // add failure to results object
   }
   console.log(log)
