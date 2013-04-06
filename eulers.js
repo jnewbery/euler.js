@@ -16,7 +16,7 @@ Array.prototype.shuffle = function() {
 }
 
 function logHeader(test){
-  console.log("===\nProblem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + ".")
+  return ("Problem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + " :: ");
 }
 
 function getPath(user, prob) {
@@ -24,23 +24,26 @@ function getPath(user, prob) {
 }
 
 function checkAnswer(test,result) {
+  var log = logHeader(test);
   if (result == test.ans) {
     var elapsedTime = new Date().getTime() - test.startTime;
-    logHeader(test);
-    console.log(result + " is the correct answer! Elapsed time was " + elapsedTime + ".")
-
+    log += (result + " is the correct answer! Elapsed time was " + elapsedTime + ".");
     //add success test.to the results object
   }
+  else if (result == "TimeoutError") {
+    log += ("Solution timed out!")
+    // add failure to resultsobject
+  }
   else {
-    logHeader(test);
-    console.log(result + " is incorrect. The correct answer is " + test.ans + ".")
+    log += (result + " is incorrect. The correct answer is " + test.ans + ".")
     // add failure to results object
   }
+  console.log(log)
 }
 
-function runAttempt(test) {
+function runAttempt(test,timeout) {
 
-  var s = new sandbox()
+  var s = new sandbox({timeout:timeout}) 
 
   var path = getPath(test.user,test.prob);
   startTime = new Date().getTime();
@@ -62,9 +65,10 @@ function main() {
   var users = require('./users.json');
 
   //Get the parameters
-  var params = require('./params.json');  
-  var first = params.first;
-  var last = params.last;
+  var params = require('./params.json'),
+      first = params.first, //the first script to be run.
+      last = params.last, //the last script to be run.
+      timeout = params.timeout; //the maximum time allowed for each script.
 
   // Get the solutions
   var answers = require('./answers.json');
@@ -84,10 +88,8 @@ function main() {
   }
   tests.shuffle();
 
-  console.log(tests);
-
   for (var i = 0; i < tests.length; i++) {
-    runAttempt(tests[i]);
+    runAttempt(tests[i],params.timeout);
   }
 
   // Iterate through results and print winners
