@@ -15,16 +15,8 @@ Array.prototype.shuffle = function() {
   return this;
 }
 
-function logHeader(test){
-  return ("Problem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + " :: ");
-}
-
-function getPath(user, prob) {
-  return(__dirname + "/user_sols/" + user + "/" + prob.toString() + ".js")
-}
-
 function checkAnswer(test,result) {
-  var log = logHeader(test);
+  var log = ("Problem: " + test.prob + ", User: " + test.user + ", Start time: " + test.startTime + " :: ");
   if (result == test.ans) {
     var elapsedTime = new Date().getTime() - test.startTime;
     log += (result + " is the correct answer! Elapsed time was " + elapsedTime + ".");
@@ -45,7 +37,7 @@ function runAttempt(test,timeout) {
 
   var s = new sandbox({timeout:timeout}) 
 
-  var path = getPath(test.user,test.prob);
+  var path = (__dirname + "/user_sols/" + test.user + "/" + test.prob.toString() + ".js");
   startTime = new Date().getTime();
   test.startTime = startTime;
   fs.readFile(path, 'utf8', function (err, data) {
