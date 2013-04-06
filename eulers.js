@@ -1,5 +1,5 @@
 var fs = require('fs');
-var vm = require('vm');
+var async = require('async')
 var sandbox = require('sandbox')
 
 Array.prototype.shuffle = function() {
@@ -61,6 +61,7 @@ function main() {
       first = params.first, //the first script to be run.
       last = params.last, //the last script to be run.
       timeout = params.timeout; //the maximum time allowed for each script.
+      simul = params.simul; //number of scripts that can be run simultaneously.
 
   // Get the solutions
   var answers = require('./answers.json');
@@ -75,14 +76,16 @@ function main() {
     
     // Iterate through the problems
     for (var prob = first; prob <= last; prob++) {
-      tests.push({prob:prob,user:user,ans:answers[prob]});
+      var test = function(callback) {
+        runAttempt({prob:this.prob,user:this.user,ans:this.ans},timeout);
+        callback(null,null);
+      }.bind({prob:prob,user:user,ans:answers[prob]})
+      tests.push(test);
     }
   }
   tests.shuffle();
 
-  for (var i = 0; i < tests.length; i++) {
-    runAttempt(tests[i],params.timeout);
-  }
+  async.parallelLimit(tests,1);
 
   // Iterate through results and print winners
 }
